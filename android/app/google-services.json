@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1046227288727",
+    "firebase_url": "https://dulieumoitruong-e3085-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "dulieumoitruong-e3085",
+    "storage_bucket": "dulieumoitruong-e3085.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046227288727:android:e08dca4529ced1ae409fd2",
+        "android_client_info": {
+          "package_name": "com.example.dlmt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClyprY_SNEDvanyKS7MJ3oXggLwm9Vl_s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
