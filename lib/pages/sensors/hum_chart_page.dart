@@ -108,7 +108,7 @@ class _HumChartPageState extends State<HumChartPage> {
               ),
             ),
           ),
-          
+
           // Chart - Compact
           Card(
             margin: const EdgeInsets.all(16),

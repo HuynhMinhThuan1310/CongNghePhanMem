@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'home_page.dart';
-import 'page_temp.dart';
-import 'page_hum.dart';
-import 'page_mq135.dart';
-import 'page_dust.dart';
+import '../sensors/temp_chart_page.dart';
+import '../sensors/hum_chart_page.dart';
+import '../sensors/smoke_chart_page.dart';
+import '../sensors/dust_page.dart';
+import '../authentication/change_password_page.dart';
 
 class DashboardPage extends StatefulWidget {
   final Widget? initialPage;
@@ -106,7 +107,7 @@ class _DashboardPageState extends State<DashboardPage> {
             ListTile(
               leading: const Icon(Icons.smoke_free),
               title: const Text('Cảm biến khói'),
-              onTap: () => _navigateToPage(const MQ135ChartPage(), 'Cảm biến khói'),
+              onTap: () => _navigateToPage(const SmokeChartPage(), 'Cảm biến khói'),
             ),
             ListTile(
               leading: const Icon(Icons.grain),
@@ -114,6 +115,19 @@ class _DashboardPageState extends State<DashboardPage> {
               onTap: () => _navigateToPage(const DustPage(), 'Bụi (PM)'),
             ),
             const Divider(),
+            ListTile(
+              leading: const Icon(Icons.lock),
+              title: const Text('Đổi mật khẩu'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ChangePasswordPage(),
+                  ),
+                );
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Đăng xuất'),

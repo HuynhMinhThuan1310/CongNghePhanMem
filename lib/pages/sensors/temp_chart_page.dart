@@ -13,6 +13,20 @@ class _TempChartPageState extends State<TempChartPage> {
   final ref = FirebaseDatabase.instance.ref("ESP32C3/nhiet_do");
   double currentTemp = 0;
 
+  String _getTempStatus(double temp) {
+    if (temp < 20) return 'Lạnh';
+    if (temp < 25) return 'Mát mẻ';
+    if (temp < 30) return 'Ấm áp';
+    return 'Nóng';
+  }
+
+  Color _getTempColor(double temp) {
+    if (temp < 20) return Colors.blue;
+    if (temp < 25) return Colors.green;
+    if (temp < 30) return Colors.orange;
+    return Colors.red;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -23,20 +37,6 @@ class _TempChartPageState extends State<TempChartPage> {
         currentTemp = double.tryParse(val.toString()) ?? 0;
       });
     });
-  }
-
-  Color _getTempColor(double temp) {
-    if (temp < 20) return Colors.blue;
-    if (temp < 25) return Colors.green;
-    if (temp < 30) return Colors.orange;
-    return Colors.red;
-  }
-
-  String _getTempStatus(double temp) {
-    if (temp < 20) return 'Lạnh';
-    if (temp < 25) return 'Mát mẻ';
-    if (temp < 30) return 'Ấm áp';
-    return 'Nóng';
   }
 
   @override

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'page_temp.dart';
-import 'page_hum.dart';
-import 'page_mq135.dart';
-import 'page_dust.dart';
 import 'dashboard_page.dart';
+import '../sensors/temp_chart_page.dart';
+import '../sensors/hum_chart_page.dart';
+import '../sensors/smoke_chart_page.dart';
+import '../sensors/dust_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -307,7 +307,7 @@ class HomePage extends StatelessWidget {
                       Colors.purple,
                       'MQ135',
                       'Phát hiện khói gas',
-                      const MQ135ChartPage(),
+                      const SmokeChartPage(),
                       'Cảm biến khói',
                     ),
                     _buildSensorCard(

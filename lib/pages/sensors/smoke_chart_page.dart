@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-class MQ135ChartPage extends StatefulWidget {
-  const MQ135ChartPage({super.key});
+class SmokeChartPage extends StatefulWidget {
+  const SmokeChartPage({super.key});
 
   @override
-  State<MQ135ChartPage> createState() => _MQ135ChartPageState();
+  State<SmokeChartPage> createState() => _SmokeChartPageState();
 }
 
-class _MQ135ChartPageState extends State<MQ135ChartPage> {
+class _SmokeChartPageState extends State<SmokeChartPage> {
   final ref = FirebaseDatabase.instance.ref("ESP32C3/mq135_raw");
   final List<FlSpot> data = [];
   double time = 0;
@@ -106,7 +106,7 @@ class _MQ135ChartPageState extends State<MQ135ChartPage> {
               ),
             ),
           ),
-          
+
           // Chart - Compact
           Card(
             margin: const EdgeInsets.all(16),
