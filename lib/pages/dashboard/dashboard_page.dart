@@ -5,6 +5,7 @@ import '../sensors/temp_chart_page.dart';
 import '../sensors/hum_chart_page.dart';
 import '../sensors/smoke_chart_page.dart';
 import '../sensors/dust_page.dart';
+import '../sensors/conclusion_page.dart';
 import '../authentication/change_password_page.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -113,6 +114,10 @@ class _DashboardPageState extends State<DashboardPage> {
               leading: const Icon(Icons.grain),
               title: const Text('Bụi (PM)'),
               onTap: () => _navigateToPage(const DustPage(), 'Bụi (PM)'),
+            ),
+            ListTile(
+              title: const Text('Tổng kết'),
+              onTap: () => _navigateToPage(const ConclusionPage(), 'Tổng kết'),
             ),
             const Divider(),
             ListTile(

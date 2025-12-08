@@ -52,7 +52,7 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 const Text(
-                  'Môi trường IoT',
+                  'Môi trường',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w400,

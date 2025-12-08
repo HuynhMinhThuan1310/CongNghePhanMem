@@ -237,8 +237,6 @@ class _HumChartPageState extends State<HumChartPage> {
                   _buildInfoRow('Trạng thái', humidityStatus, humidityColor),
                   const Divider(height: 16),
                   _buildInfoRow('Phạm vi lý tưởng', '40 - 60%', Colors.green),
-                  const Divider(height: 16),
-                  _buildInfoRow('Số liệu đo', '${data.length} mẫu', Colors.grey),
                 ],
               ),
             ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class DustPage extends StatefulWidget {
@@ -106,82 +105,9 @@ class _DustPageState extends State<DustPage> {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    SizedBox(
-                      width: 130,
-                      height: 130,
-                      child: SfRadialGauge(
-                        axes: [
-                          RadialAxis(
-                            minimum: 0,
-                            maximum: 500,
-                            showLabels: false,
-                            showTicks: false,
-                            ranges: [
-                              GaugeRange(
-                                startValue: 0,
-                                endValue: 50,
-                                color: Colors.green,
-                                startWidth: 10,
-                                endWidth: 10,
-                              ),
-                              GaugeRange(
-                                startValue: 50,
-                                endValue: 100,
-                                color: Colors.yellow[700]!,
-                                startWidth: 10,
-                                endWidth: 10,
-                              ),
-                              GaugeRange(
-                                startValue: 100,
-                                endValue: 250,
-                                color: Colors.orange,
-                                startWidth: 10,
-                                endWidth: 10,
-                              ),
-                              GaugeRange(
-                                startValue: 250,
-                                endValue: 500,
-                                color: Colors.red,
-                                startWidth: 10,
-                                endWidth: 10,
-                              ),
-                            ],
-                            pointers: [
-                              NeedlePointer(
-                                value: density.clamp(0, 500),
-                              ),
-                            ],
-                            annotations: [
-                              GaugeAnnotation(
-                                widget: Text(
-                                  '${density.toStringAsFixed(0)}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: color,
-                                  ),
-                                ),
-                                angle: 90,
-                                positionFactor: 0.7,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Voltage: ${voltage.toStringAsFixed(3)} V',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -210,10 +136,6 @@ class _DustPageState extends State<DustPage> {
                       ),
                     ),
                     leftTitles: AxisTitles(
-                      axisNameWidget: const Text(
-                        'Nồng độ bụi (µg/m³)',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
                       sideTitles: SideTitles(
                         showTitles: true,
                         interval: 50,

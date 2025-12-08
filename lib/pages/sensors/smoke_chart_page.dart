@@ -213,7 +213,6 @@ class _SmokeChartPageState extends State<SmokeChartPage> {
                   const Divider(height: 16),
                   _buildInfoRow('Phạm vi an toàn', '< 500', Colors.green),
                   const Divider(height: 16),
-                  _buildInfoRow('Số liệu đo', '${data.length} mẫu', Colors.grey),
                 ],
               ),
             ),
