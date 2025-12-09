@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '/widgets/line_chart_widget.dart';
 
 class SmokeChartPage extends StatefulWidget {
   const SmokeChartPage({super.key});
@@ -51,147 +52,22 @@ class _SmokeChartPageState extends State<SmokeChartPage> {
 
     return SingleChildScrollView(
       child: Column(
-        children: [
-          // Current smoke level card
-          Card(
-            margin: const EdgeInsets.all(16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.smoke_free,
-                        color: smokeLevelColor,
-                        size: 48,
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Mức độ khói',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                smokeLevel,
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: smokeLevelColor,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '(${currentValue.toStringAsFixed(0)})',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Chart - Compact
+        children: [    
           Card(
             margin: const EdgeInsets.all(16),
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: SizedBox(
-                height: 200,
-                child: LineChart(
-                  LineChartData(
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: true,
-                      horizontalInterval: 500,
-                      verticalInterval: 5,
-                      getDrawingHorizontalLine: (value) {
-                        return FlLine(
-                          color: Colors.grey.withOpacity(0.3),
-                          strokeWidth: 1,
-                        );
-                      },
-                      getDrawingVerticalLine: (value) {
-                        return FlLine(
-                          color: Colors.grey.withOpacity(0.3),
-                          strokeWidth: 1,
-                        );
-                      },
-                    ),
-                    titlesData: FlTitlesData(
-                      show: true,
-                      rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: false,
-                        ),
-                      ),
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          interval: 500,
-                          reservedSize: 45,
-                          getTitlesWidget: (value, meta) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 4),
-                              child: Text(
-                                value.toInt().toString(),
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    borderData: FlBorderData(show: true),
-                    minX: data.isEmpty ? 0 : data.first.x,
-                    maxX: data.isEmpty ? 10 : data.last.x,
-                    minY: 0,
-                    maxY: 2000,
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: data,
-                        isCurved: true,
-                        color: smokeLevelColor,
-                        barWidth: 2,
-                        dotData: const FlDotData(show: false),
-                        belowBarData: BarAreaData(
-                          show: true,
-                          color: smokeLevelColor.withOpacity(0.2),
-                        ),
-                      ),
-                    ],
-                  ),
+                height: 400,
+                child: LineChartWidget(
+                  spots: data,
+                  maxY: 2000,
+                  lineColor: smokeLevelColor,
+                  barWidth: 2,
                 ),
               ),
             ),
           ),
-
-          // Info card
           Card(
             margin: const EdgeInsets.all(16),
             child: Padding(

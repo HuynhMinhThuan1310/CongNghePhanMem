@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '/widgets/line_chart_widget.dart';
 
 class DustPage extends StatefulWidget {
   const DustPage({super.key});
@@ -17,6 +18,20 @@ class _DustPageState extends State<DustPage> {
   double density = 0; // in ug/m3 as stored
   final List<FlSpot> _spots = [];
   double _t = 0;
+
+  String _densityLabel(double d) {
+    if (d < 50) return 'Tốt';
+    if (d < 100) return 'Trung bình';
+    if (d < 250) return 'Kém';
+    return 'Nguy hại';
+  }
+
+  Color _densityColor(double d) {
+    if (d < 50) return Colors.green;
+    if (d < 100) return Colors.yellow[700]!;
+    if (d < 250) return Colors.orange;
+    return Colors.red;
+  }
 
   @override
   void initState() {
@@ -40,150 +55,65 @@ class _DustPageState extends State<DustPage> {
     });
   }
 
-  String _densityLabel(double d) {
-    if (d < 50) return 'Tốt';
-    if (d < 100) return 'Trung bình';
-    if (d < 250) return 'Kém';
-    return 'Nguy hại';
-  }
-
-  Color _densityColor(double d) {
-    if (d < 50) return Colors.green;
-    if (d < 100) return Colors.yellow[700]!;
-    if (d < 250) return Colors.orange;
-    return Colors.red;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final label = _densityLabel(density);
     final color = _densityColor(density);
+    final label = _densityLabel(density);
 
-    return Column(
-      children: [
-        Card(
-          margin: const EdgeInsets.all(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            'Cảm biến bụi',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            '${density.toStringAsFixed(0)} µg/m³',
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: color,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            label,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: color,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                  ],
-                ),
-                const SizedBox(height: 12),
-              ],
-            ),
-          ),
-        ),
-
-        Expanded(
-          child: Card(
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Chart Section
+          Card(
             margin: const EdgeInsets.all(16),
             child: Padding(
               padding: const EdgeInsets.all(12),
-              child: LineChart(
-                LineChartData(
-                  minY: 0,
+              child: SizedBox(
+                height: 400,
+                child: LineChartWidget(
+                  spots: _spots,
                   maxY: 500,
-                  titlesData: FlTitlesData(
-                    show: true,
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: false,
-                      ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        interval: 50,
-                        reservedSize: 50,
-                        getTitlesWidget: (value, meta) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: Text(
-                              value.toInt().toString(),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine: (value) {
-                      return FlLine(
-                        color: Colors.grey.withOpacity(0.3),
-                        strokeWidth: 1,
-                      );
-                    },
-                  ),
-                  borderData: FlBorderData(show: true),
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: _spots,
-                      isCurved: true,
-                      color: color,
-                      barWidth: 3,
-                      dotData: FlDotData(show: false),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        color: color.withOpacity(0.2),
-                      ),
-                    ),
-                  ],
+                  lineColor: color,
+                  barWidth: 3,
                 ),
               ),
             ),
           ),
-        ),
+          
+          // Info Section
+          Card(
+            margin: const EdgeInsets.all(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Thông tin chi tiết',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildInfoRow('Giá trị hiện tại', '${density.toStringAsFixed(0)} µg/m³', color),
+                  const Divider(height: 16),
+                  _buildInfoRow('Trạng thái', label, color),
+                  const Divider(height: 16),
+                  _buildInfoRow('Phạm vi lý tưởng', 'Dưới 50 µg/m³', Colors.green),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value, Color valueColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: valueColor)),
       ],
     );
   }

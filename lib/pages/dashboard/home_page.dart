@@ -247,9 +247,7 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ),
-
           const SizedBox(height: 24),
-
           // Sensor Cards Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -271,14 +269,14 @@ class HomePage extends StatelessWidget {
                     color: Colors.grey[600],
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 GridView.count(
                   crossAxisCount: 2,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
-                  childAspectRatio: 0.85,
+                  childAspectRatio: 1.2,
                   children: [
                     _buildSensorCard(
                       context,

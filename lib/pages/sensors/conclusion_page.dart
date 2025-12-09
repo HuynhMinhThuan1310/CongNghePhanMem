@@ -117,8 +117,9 @@ class _ConclusionPageState extends State<ConclusionPage> {
 
   double _getTempScore(double temp) {
     if (temp < 20 || temp > 30) return 1;
-    if (temp < 25 || temp > 28) return 2;
-    return 3;
+    if (temp < 25) return 3;
+    if (temp < 28) return 2;
+    return 1;
   }
 
   String _getHumidityStatus(double humidity) {
@@ -172,7 +173,7 @@ class _ConclusionPageState extends State<ConclusionPage> {
 
     if (totalScore >= 2.8) {
       return '✅ MÔI TRƯỜNG TỐT';
-    } else if (totalScore >= 2) {
+    } else if (totalScore >= 2.0) {
       return '⚠️ MÔI TRƯỜNG BÌNH THƯỜNG';
     } else {
       return '❌ MÔI TRƯỜNG KÉM';
@@ -257,8 +258,6 @@ class _ConclusionPageState extends State<ConclusionPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    _buildDataTable(),
-                    const SizedBox(height: 20),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -272,7 +271,7 @@ class _ConclusionPageState extends State<ConclusionPage> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Kết luận được cập nhật mỗi 30 giây dựa trên dữ liệu từ 4 cảm biến',
+                              'Kết quả được cập nhật mỗi 30 giây',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.blue[700],
@@ -287,87 +286,6 @@ class _ConclusionPageState extends State<ConclusionPage> {
               ),
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDataTable() {
-    return Table(
-      border: TableBorder.all(color: Colors.grey[300]!),
-      columnWidths: {
-        0: const FlexColumnWidth(2),
-        1: const FlexColumnWidth(2),
-      },
-      children: [
-        TableRow(
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-          ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(
-                'Thông số',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(
-                'Giá trị',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        TableRow(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text('Nhiệt độ'),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text('${temperature.toStringAsFixed(1)}°C'),
-            ),
-          ],
-        ),
-        TableRow(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text('Độ ẩm'),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text('${humidity.toStringAsFixed(1)}%'),
-            ),
-          ],
-        ),
-        TableRow(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text('Bụi'),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text('${dustDensity.toStringAsFixed(0)} µg/m³'),
-            ),
-          ],
-        ),
-        TableRow(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text('Khí độc (MQ135)'),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text('${smokeValue.toStringAsFixed(0)}'),
-            ),
-          ],
         ),
       ],
     );

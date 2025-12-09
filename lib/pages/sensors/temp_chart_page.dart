@@ -49,13 +49,6 @@ class _TempChartPageState extends State<TempChartPage> {
         Expanded(
           child: Center(
             child: SfRadialGauge(
-              title: const GaugeTitle(
-                text: 'Nhiệt độ',
-                textStyle: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               axes: <RadialAxis>[
                 RadialAxis(
                   minimum: 0,
@@ -63,32 +56,16 @@ class _TempChartPageState extends State<TempChartPage> {
                   labelFormat: '{value}°C',
                   ranges: <GaugeRange>[
                     GaugeRange(
-                      startValue: 0,
-                      endValue: 20,
-                      color: Colors.blue,
-                      startWidth: 10,
-                      endWidth: 10,
+                      startValue: 0, endValue: 20, color: Colors.blue,
                     ),
                     GaugeRange(
-                      startValue: 20,
-                      endValue: 25,
-                      color: Colors.green,
-                      startWidth: 10,
-                      endWidth: 10,
+                      startValue: 20, endValue: 25, color: Colors.green,
                     ),
                     GaugeRange(
-                      startValue: 25,
-                      endValue: 30,
-                      color: Colors.orange,
-                      startWidth: 10,
-                      endWidth: 10,
+                      startValue: 25, endValue: 30, color: Colors.orange,
                     ),
                     GaugeRange(
-                      startValue: 30,
-                      endValue: 50,
-                      color: Colors.red,
-                      startWidth: 10,
-                      endWidth: 10,
+                      startValue: 30, endValue: 50, color: Colors.red,
                     ),
                   ],
                   pointers: <GaugePointer>[
