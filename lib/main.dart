@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Giám sát môi trường đô thị',
+      title: 'Giám sát môi trường',
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.green),
       home: const AuthWrapper(),
       debugShowCheckedModeBanner: false,

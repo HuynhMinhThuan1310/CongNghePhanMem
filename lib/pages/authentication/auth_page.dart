@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/firebase_auth_service.dart';
+import 'forgot_password_page.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -21,10 +23,7 @@ class _AuthPageState extends State<AuthPage> {
   bool _showEmailError = false;
   bool _showPasswordError = false;
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // Token xác thực (có thể thay bằng lấy từ Firebase)
-  static const String VALID_TOKEN = "DLMT2024";
+  final FirebaseAuthService _authService = FirebaseAuthService();
 
   @override
   void initState() {
@@ -35,13 +34,16 @@ class _AuthPageState extends State<AuthPage> {
 
   void _validateEmail() {
     setState(() {
-      _showEmailError = _emailController.text.isNotEmpty && !_isValidEmail(_emailController.text.trim());
+      _showEmailError = _emailController.text.isNotEmpty &&
+          !_authService.isValidEmail(_emailController.text.trim());
     });
   }
 
   void _validatePassword() {
     setState(() {
-      _showPasswordError = _passwordController.text.isNotEmpty && _passwordController.text.length < 6;
+      _showPasswordError =
+          _passwordController.text.isNotEmpty &&
+              _passwordController.text.length < 6;
     });
   }
 
@@ -61,62 +63,48 @@ class _AuthPageState extends State<AuthPage> {
       _errorMessage = null;
     });
 
-    // Validation
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final confirmPassword = _confirmPasswordController.text.trim();
     final name = _nameController.text.trim();
     final token = _tokenController.text.trim();
 
-    // Kiểm tra email hợp lệ
-    if (!_isValidEmail(email)) {
+    if (!_authService.isValidEmail(email)) {
       setState(() {
-        _errorMessage = 'Email không hợp lệ. Vui lòng nhập email đúng định dạng (ví dụ: user@example.com)';
+        _errorMessage =
+            'Email không hợp lệ. Vui lòng nhập đúng định dạng (ví dụ: user@example.com).';
         _isLoading = false;
       });
       return;
     }
 
-    // Kiểm tra mật khẩu
     if (password.length < 6) {
       setState(() {
-        _errorMessage = 'Mật khẩu phải có ít nhất 6 kí tự';
+        _errorMessage = 'Mật khẩu phải có ít nhất 6 kí tự.';
         _isLoading = false;
       });
       return;
     }
 
-    // Kiểm tra tên khi đăng ký
     if (!_isLogin && name.isEmpty) {
       setState(() {
-        _errorMessage = 'Vui lòng nhập tên của bạn';
+        _errorMessage = 'Vui lòng nhập tên của bạn.';
         _isLoading = false;
       });
       return;
     }
 
-    // Kiểm tra xác nhận mật khẩu khi đăng ký
     if (!_isLogin && password != confirmPassword) {
       setState(() {
-        _errorMessage = 'Mật khẩu và xác nhận mật khẩu không trùng khớp';
+        _errorMessage = 'Mật khẩu xác nhận không trùng khớp.';
         _isLoading = false;
       });
       return;
     }
 
-    // Kiểm tra token khi đăng ký
     if (!_isLogin && token.isEmpty) {
       setState(() {
-        _errorMessage = 'Vui lòng nhập mã xác thực để đăng ký';
-        _isLoading = false;
-      });
-      return;
-    }
-
-    // Kiểm tra token hợp lệ
-    if (!_isLogin && token != VALID_TOKEN) {
-      setState(() {
-        _errorMessage = 'Mã Token không đúng. Vui lòng kiểm tra lại.';
+        _errorMessage = 'Vui lòng nhập mã xác thực Token.';
         _isLoading = false;
       });
       return;
@@ -124,24 +112,21 @@ class _AuthPageState extends State<AuthPage> {
 
     try {
       if (_isLogin) {
-        // Đăng nhập
-        await _auth.signInWithEmailAndPassword(
+        await _authService.signInWithEmail(
           email: email,
           password: password,
         );
       } else {
-        // Đăng ký
-        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        await _authService.signUpWithEmail(
           email: email,
           password: password,
+          name: name,
+          token: token,
         );
-
-        // Cập nhật display name
-        await userCredential.user?.updateDisplayName(name);
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
-        _errorMessage = _getErrorMessage(e.code);
+        _errorMessage = _authService.getErrorMessage(e.code);
         _isLoading = false;
       });
       return;
@@ -158,38 +143,6 @@ class _AuthPageState extends State<AuthPage> {
     });
   }
 
-  bool _isValidEmail(String email) {
-    final regex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-    );
-    return regex.hasMatch(email);
-  }
-
-  String _getErrorMessage(String code) {
-    switch (code) {
-      case 'user-not-found':
-        return 'Tài khoản không tìm thấy. Vui lòng kiểm tra email hoặc đăng ký tài khoản mới.';
-      case 'wrong-password':
-        return 'Mật khẩu không chính xác. Vui lòng thử lại.';
-      case 'invalid-credential':
-        return 'Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại.';
-      case 'email-already-in-use':
-        return 'Email này đã được sử dụng. Vui lòng sử dụng email khác hoặc đăng nhập với tài khoản này.';
-      case 'weak-password':
-        return 'Mật khẩu quá yếu. Vui lòng sử dụng mật khẩu có ít nhất 6 kí tự.';
-      case 'invalid-email':
-        return 'Email không hợp lệ. Vui lòng nhập đúng định dạng email.';
-      case 'operation-not-allowed':
-        return 'Đăng ký bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.';
-      case 'too-many-requests':
-        return 'Bạn đã cố gắng đăng nhập quá nhiều lần. Vui lòng thử lại sau.';
-      case 'account-exists-with-different-credential':
-        return 'Tài khoản đã tồn tại với phương thức đăng nhập khác.';
-      default:
-        return 'Lỗi xác thực: $code. Vui lòng thử lại.';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -201,14 +154,13 @@ class _AuthPageState extends State<AuthPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo/Icon
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.green.shade400,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.eco,
                     size: 64,
                     color: Colors.white,
@@ -216,7 +168,6 @@ class _AuthPageState extends State<AuthPage> {
                 ),
                 const SizedBox(height: 32),
 
-                // Tiêu đề
                 Text(
                   _isLogin ? 'Đăng nhập' : 'Đăng ký',
                   style: const TextStyle(
@@ -226,9 +177,7 @@ class _AuthPageState extends State<AuthPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _isLogin
-                      ? 'Chào mừng trở lại!'
-                      : 'Tạo tài khoản mới',
+                  _isLogin ? 'Chào mừng trở lại!' : 'Tạo tài khoản mới',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey[600],
@@ -236,7 +185,6 @@ class _AuthPageState extends State<AuthPage> {
                 ),
                 const SizedBox(height: 32),
 
-                // Form
                 if (!_isLogin)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16),
@@ -254,7 +202,6 @@ class _AuthPageState extends State<AuthPage> {
                     ),
                   ),
 
-                // Email field
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: TextField(
@@ -267,27 +214,14 @@ class _AuthPageState extends State<AuthPage> {
                       ),
                       filled: true,
                       fillColor: Colors.white,
-                      errorText: _showEmailError ? 'Email không hợp lệ' : null,
-                      errorBorder: _showEmailError
-                          ? OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.red),
-                            )
-                          : null,
-                      focusedErrorBorder: _showEmailError
-                          ? OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.red, width: 2),
-                            )
-                          : null,
+                      errorText:
+                      _showEmailError ? 'Email không hợp lệ' : null,
                     ),
-                    keyboardType: TextInputType.emailAddress,
                   ),
                 ),
 
-                // Password field
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.only(bottom: 4),
                   child: TextField(
                     controller: _passwordController,
                     decoration: InputDecoration(
@@ -298,25 +232,38 @@ class _AuthPageState extends State<AuthPage> {
                       ),
                       filled: true,
                       fillColor: Colors.white,
-                      errorText: _showPasswordError ? 'Mật khẩu phải có ít nhất 6 kí tự' : null,
-                      errorBorder: _showPasswordError
-                          ? OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.red),
-                            )
-                          : null,
-                      focusedErrorBorder: _showPasswordError
-                          ? OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.red, width: 2),
-                            )
+                      errorText: _showPasswordError
+                          ? 'Mật khẩu phải có ít nhất 6 kí tự'
                           : null,
                     ),
                     obscureText: true,
                   ),
                 ),
 
-                // Confirm password field (chỉ khi đăng ký)
+                // ⭐ NÚT QUÊN MẬT KHẨU ⭐
+                if (_isLogin)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const ForgotPasswordPage(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Quên mật khẩu?",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+
                 if (!_isLogin)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16),
@@ -335,29 +282,23 @@ class _AuthPageState extends State<AuthPage> {
                     ),
                   ),
 
-                // Token field (chỉ khi đăng ký)
                 if (!_isLogin)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: TextField(
                       controller: _tokenController,
                       decoration: InputDecoration(
-                        hintText: 'Mã Token (Trên Thiết Bị của Bạn)',
+                        hintText: 'Mã Token (Trên thiết bị của bạn)',
                         prefixIcon: const Icon(Icons.verified_user),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         filled: true,
                         fillColor: Colors.white,
-                        suffixIcon: Tooltip(
-                          message: 'Bạn cần mã xác thực để đăng ký. Vui lòng liên hệ quản trị viên.',
-                          child: Icon(Icons.info_outline, color: Colors.grey[600]),
-                        ),
                       ),
                     ),
                   ),
 
-                // Error message
                 if (_errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16),
@@ -378,7 +319,6 @@ class _AuthPageState extends State<AuthPage> {
                     ),
                   ),
 
-                // Auth button
                 SizedBox(
                   width: double.infinity,
                   height: 56,
@@ -392,28 +332,26 @@ class _AuthPageState extends State<AuthPage> {
                     ),
                     child: _isLoading
                         ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
-                              ),
-                            ),
-                          )
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                        AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
                         : Text(
-                            _isLogin ? 'Đăng nhập' : 'Đăng ký',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
+                      _isLogin ? 'Đăng nhập' : 'Đăng ký',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // Toggle between login/register
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -446,7 +384,7 @@ class _AuthPageState extends State<AuthPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ],
