@@ -15,156 +15,111 @@ class DashboardPage extends StatefulWidget {
   final Widget? initialPage;
   final String? initialTitle;
 
-  const DashboardPage({
-    super.key,
-    this.initialPage,
-    this.initialTitle,
-  });
+  const DashboardPage({super.key, this.initialPage, this.initialTitle});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  late Widget _currentPage;
-  late String _currentTitle;
-
-  static const Color appGreen = Color(0xFF66BB6A);
-
-  // Custom palette
-  static const Color cHome = Color(0xFF43A047);
-  static const Color cTemp = Color(0xFFEF5350);
-  static const Color cHum = Color(0xFF42A5F5);
-  static const Color cGas = Color(0xFFFF7043);
-  static const Color cDust = Color(0xFF8E24AA);
-  static const Color cOverview = Color(0xFF26A69A);
-  static const Color cInfo = Color(0xFF66BB6A);
-  static const Color cPassword = Color(0xFFFBC02D);
-  static const Color cLogout = Color(0xFFE53935);
+  Widget _currentPage = const SizedBox.shrink();
+  String _currentTitle = "Trang chủ";
 
   @override
   void initState() {
     super.initState();
-    _currentPage = widget.initialPage ?? const HomePage();
     _currentTitle = widget.initialTitle ?? "Trang chủ";
+    _currentPage = widget.initialPage ?? HomePage(onNavigate: _setPage);
   }
 
-  void _navigate(Widget page, String title) {
-    Navigator.pop(context);
+  void _setPage(Widget page, String title) {
     setState(() {
       _currentPage = page;
       _currentTitle = title;
     });
   }
 
+  void _openFromDrawer(Widget page, String title) {
+    Navigator.pop(context);
+    _setPage(page, title);
+  }
+
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_currentTitle),
-        centerTitle: true,
-        elevation: 1,
-        backgroundColor: appGreen,
-        foregroundColor: Colors.white,
+        title: Text(_currentTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
       ),
-
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            _drawerHeader(),
+            DrawerHeader(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [cs.primary, cs.primaryContainer],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(Icons.eco_rounded, size: 46, color: Colors.white),
+                  SizedBox(height: 10),
+                  Text(
+                    "Giám sát môi trường",
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                  ),
+                  SizedBox(height: 4),
+                  Text("Hệ thống IoT trong nhà", style: TextStyle(color: Colors.white70)),
+                ],
+              ),
+            ),
 
-            _menuItem(Icons.home, "Trang chủ", cHome,
-                () => _navigate(const HomePage(), "Trang chủ")),
-            _divider(),
+            _item(Icons.home_rounded, "Trang chủ", () => _openFromDrawer(HomePage(onNavigate: _setPage), "Trang chủ")),
+            const Divider(),
 
-            _menuItem(Icons.thermostat, "Nhiệt độ", cTemp,
-                () => _navigate(const TempChartPage(), "Nhiệt độ")),
-            _menuItem(Icons.water_drop, "Độ ẩm", cHum,
-                () => _navigate(const HumChartPage(), "Độ ẩm")),
-            _menuItem(Icons.smoke_free, "Khí gas", cGas,
-                () => _navigate(const SmokeChartPage(), "Khí gas")),
-            _menuItem(Icons.grain, "Bụi (PM)", cDust,
-                () => _navigate(const DustPage(), "Bụi (PM)")),
-            _menuItem(Icons.dashboard_customize, "Tổng quan", cOverview,
-                () => _navigate(const ConclusionPage(), "Tổng quan")),
+            _item(Icons.thermostat_rounded, "Nhiệt độ", () => _openFromDrawer(const TempChartPage(), "Nhiệt độ")),
+            _item(Icons.water_drop_rounded, "Độ ẩm", () => _openFromDrawer(const HumChartPage(), "Độ ẩm")),
+            _item(Icons.air_rounded, "Khí gas", () => _openFromDrawer(const SmokeChartPage(), "Khí gas")),
+            _item(Icons.grain_rounded, "Bụi (PM)", () => _openFromDrawer(const DustPage(), "Bụi (PM)")),
+            _item(Icons.dashboard_customize_rounded, "Tổng quan", () => _openFromDrawer(const ConclusionPage(), "Tổng quan")),
 
-            _divider(),
+            const Divider(),
 
-            _menuItem(Icons.info_outline, "Giới thiệu dự án", cInfo, () {
+            _item(Icons.info_outline_rounded, "Giới thiệu dự án", () {
               Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AboutPage()),
-              );
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutPage()));
             }),
 
-            _divider(),
-
-            _menuItem(Icons.lock, "Đổi mật khẩu", cPassword, () {
+            _item(Icons.lock_rounded, "Đổi mật khẩu", () {
               Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ChangePasswordPage()),
-              );
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordPage()));
             }),
 
-            _menuItem(Icons.logout, "Đăng xuất", cLogout, () async {
-              Navigator.pop(context);
-              await FirebaseAuth.instance.signOut();
-            }),
+            const Divider(),
+
+            _item(Icons.logout_rounded, "Đăng xuất", _logout),
           ],
         ),
       ),
-
-      body: _currentPage,
+      body: SafeArea(child: _currentPage),
     );
   }
 
-  Widget _drawerHeader() {
-    return DrawerHeader(
-      decoration: const BoxDecoration(color: appGreen),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: const [
-          Icon(Icons.eco, size: 48, color: Colors.white),
-          SizedBox(height: 8),
-          Text(
-            "Giám sát môi trường",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            "Hệ thống IoT",
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _menuItem(IconData icon, String title, Color color, VoidCallback onTap) {
+  Widget _item(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
-      leading: Icon(icon, color: color, size: 26),
-      title: Text(
-        title,
-        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-      ),
+      leading: Icon(icon),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
       onTap: onTap,
-    );
-  }
-
-  Widget _divider() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Divider(color: Colors.grey.shade300),
     );
   }
 }

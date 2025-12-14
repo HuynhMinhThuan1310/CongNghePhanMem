@@ -1,23 +1,10 @@
 import 'package:flutter/material.dart';
 import '/services/firebase_database_service.dart';
+import '/services/sensor_status.dart';
 import '/widgets/stream_chart_page.dart';
 
 class SmokeChartPage extends StatelessWidget {
   const SmokeChartPage({super.key});
-
-  String smokeStatus(double v) {
-    if (v < 500) return "An toàn";
-    if (v < 1000) return "Nhẹ";
-    if (v < 2000) return "Trung bình";
-    return "Nguy hiểm";
-  }
-
-  Color smokeColor(double v) {
-    if (v < 500) return Colors.green;
-    if (v < 1000) return Colors.yellow;
-    if (v < 2000) return Colors.orange;
-    return Colors.red;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +13,17 @@ class SmokeChartPage extends StatelessWidget {
     return StreamChartPage(
       stream: db.getSmokeStream(),
       maxY: 2000,
-      title: "Khí độc MQ135",
-      statusBuilder: smokeStatus,
-      colorBuilder: smokeColor,
+      title: "Chất lượng không khí (MQ135 raw)",
+      unit: "",
+      statusBuilder: SensorStatus.smokeStatus,
+      colorBuilder: SensorStatus.smokeColor,
       safeRangeText: "< 500",
+      valueFormatter: (v) => v.toStringAsFixed(0),
+      tips: const [
+        "Nếu tăng cao: mở cửa, bật quạt hút / thông gió.",
+        "Tránh đặt cảm biến sát bếp/khói trực tiếp (sai lệch).",
+        "Kiểm tra nguồn mùi: gas, sơn, hóa chất, khói thuốc…",
+      ],
     );
   }
 }

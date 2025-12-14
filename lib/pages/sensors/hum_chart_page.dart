@@ -1,25 +1,10 @@
 import 'package:flutter/material.dart';
 import '/services/firebase_database_service.dart';
+import '/services/sensor_status.dart';
 import '/widgets/stream_chart_page.dart';
 
 class HumChartPage extends StatelessWidget {
   const HumChartPage({super.key});
-
-  String humStatus(double h) {
-    if (h < 30) return "Quá khô";
-    if (h < 40) return "Khô";
-    if (h < 60) return "Thoải mái";
-    if (h < 70) return "Hơi ẩm";
-    return "Quá ẩm";
-  }
-
-  Color humColor(double h) {
-    if (h < 30) return Colors.red;
-    if (h < 40) return Colors.orange;
-    if (h < 60) return Colors.green;
-    if (h < 70) return Colors.blue;
-    return Colors.purple;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +13,16 @@ class HumChartPage extends StatelessWidget {
     return StreamChartPage(
       stream: db.getHumidityStream(),
       maxY: 100,
-      title: "Độ ẩm hiện tại",
-      statusBuilder: humStatus,
-      colorBuilder: humColor,
+      title: "Độ ẩm trong phòng",
+      unit: "%",
+      statusBuilder: SensorStatus.humStatus,
+      colorBuilder: SensorStatus.humColor,
       safeRangeText: "40–60%",
+      tips: const [
+        "Duy trì 40–60% để giảm nấm mốc và khô da.",
+        "Nếu quá ẩm: bật quạt thông gió / hút ẩm.",
+        "Nếu quá khô: dùng máy tạo ẩm hoặc đặt khay nước.",
+      ],
     );
   }
 }
