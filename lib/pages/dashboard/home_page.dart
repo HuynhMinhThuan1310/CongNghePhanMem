@@ -123,7 +123,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   int _smokeScore(double v) {
-    if (v < 500) return 100;
+    if (v < 600) return 100;
     if (v < 1000) return 70;
     if (v < 2000) return 50;
     return 20;
