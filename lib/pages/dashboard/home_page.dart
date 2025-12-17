@@ -427,7 +427,7 @@ class _HomePageState extends State<HomePage> {
     onTap: onTap,
     child: Card(
       child: Padding(
-        padding: const EdgeInsets.all(10), // giảm padding
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

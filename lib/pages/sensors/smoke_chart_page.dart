@@ -12,12 +12,12 @@ class SmokeChartPage extends StatelessWidget {
 
     return StreamChartPage(
       stream: db.getSmokeStream(),
-      maxY: 2000,
+      maxY: 4500,
       title: "Chất lượng không khí (MQ135 raw)",
       unit: "",
       statusBuilder: SensorStatus.smokeStatus,
       colorBuilder: SensorStatus.smokeColor,
-      safeRangeText: "< 500",
+      safeRangeText: "< 600",
       valueFormatter: (v) => v.toStringAsFixed(0),
       tips: const [
         "Nếu tăng cao: mở cửa, bật quạt hút / thông gió.",

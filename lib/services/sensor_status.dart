@@ -51,7 +51,7 @@ class SensorStatus {
 
   // ---------- Smoke / Gas ----------
   static String smokeStatus(double v) {
-    if (v < 500) return "An toàn";
+    if (v < 600) return "An toàn";
     if (v < 1000) return "Nhẹ";
     if (v < 2000) return "Trung bình";
     return "Nguy hiểm";
