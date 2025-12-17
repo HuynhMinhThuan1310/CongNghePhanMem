@@ -101,7 +101,7 @@ class LineChartWidget extends StatelessWidget {
         lineBarsData: [
           LineChartBarData(
             spots: spots,
-            isCurved: true,
+            isCurved:false,
             color: lineColor,
             barWidth: barWidth,
             isStrokeCapRound: true,
