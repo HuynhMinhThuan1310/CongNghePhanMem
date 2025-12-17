@@ -2,114 +2,105 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class LineChartWidget extends StatelessWidget {
-  final List<FlSpot> spots;
+  final List<double> values;
+  final List<DateTime>? times;
+
   final double minY;
   final double maxY;
-  final Color lineColor;
-  final double barWidth;
-  final Duration? tooltipDuration;
+  final Color color;
+  final String unit;
 
   const LineChartWidget({
     super.key,
-    required this.spots,
-    this.minY = 0,
+    required this.values,
+    required this.minY,
     required this.maxY,
-    required this.lineColor,
-    this.barWidth = 2,
-    this.tooltipDuration,
+    required this.color,
+    this.unit = "",
+    this.times,
   });
 
   @override
   Widget build(BuildContext context) {
     return LineChart(
       LineChartData(
-        // ---- TOUCH TOOLTIP ----
-        lineTouchData: LineTouchData(
-          enabled: true,
-          touchTooltipData: LineTouchTooltipData(
-            tooltipRoundedRadius: 8,
-            tooltipPadding: const EdgeInsets.all(8),
-            tooltipBorder: BorderSide(
-              color: Colors.blue.withValues(alpha: 0.2), // FIX deprecated
-              width: 1,
-            ),
-            getTooltipItems: (touchedSpots) {
-              return touchedSpots.map((spot) {
-                return LineTooltipItem(
-                  spot.y.toStringAsFixed(1),         // FIX interpolation warning
-                  TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                  ),
-                );
-              }).toList();
-            },
-          ),
-        ),
+        minY: minY,
+        maxY: maxY,
+        minX: 0,
+        maxX: values.isEmpty ? 0 : (values.length - 1).toDouble(),
 
-        // ---- GRID LINES ----
-        gridData: FlGridData(
-          show: true,
-          drawVerticalLine: true,
-          horizontalInterval: (maxY - minY) / 5,
-          verticalInterval: (spots.isEmpty ? 10 : spots.last.x) / 10,
-          getDrawingHorizontalLine: (value) => FlLine(
-            color: Colors.grey.withValues(alpha: 0.3), // FIX deprecated
-            strokeWidth: 1,
-          ),
-          getDrawingVerticalLine: (value) => FlLine(
-            color: Colors.grey.withValues(alpha: 0.3), // FIX deprecated
-            strokeWidth: 1,
-          ),
-        ),
+        gridData: FlGridData(show: true),
+        borderData: FlBorderData(show: true),
 
-        // ---- AXIS TITLES ----
         titlesData: FlTitlesData(
-          show: true,
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          bottomTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          leftTitles: AxisTitles(
+          // ================= TRỤC X (THỜI GIAN) =================
+          bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: (maxY - minY) / 5,
-              reservedSize: 40,
-              getTitlesWidget: (value, meta) => Padding(
-                padding: const EdgeInsets.only(right: 4),
-                child: Text(
-                  value.toInt().toString(),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
+              interval: 1,
+              reservedSize: 36, // ÉP CHỖ CHO THỜI GIAN
+              getTitlesWidget: (value, meta) {
+                final index = value.toInt();
+                if (times == null || index < 0 || index >= times!.length) {
+                  return const SizedBox.shrink();
+                }
+
+                final t = times![index];
+                return Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    '${t.hour.toString().padLeft(2, '0')}:'
+                    '${t.minute.toString().padLeft(2, '0')}:'
+                    '${t.second.toString().padLeft(2, '0')}',
+                    style: const TextStyle(fontSize: 10),
                   ),
+                );
+              },
+            ),
+          ),
+
+          // ================= TRỤC Y (ÉP HIỆN ĐƠN VỊ) =================
+          leftTitles: AxisTitles(
+            axisNameWidget: Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                unit, // °C, %, ppm, µg/m³
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+            axisNameSize: 20, // 👈 ÉP KHÔNG GIAN CHO ĐƠN VỊ
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 44, // 👈 ÉP RỘNG ĐỦ CHO SỐ
+              interval: (maxY - minY) / 4,
+              getTitlesWidget: (value, meta) {
+                return Text(
+                  value.toStringAsFixed(0),
+                  style: const TextStyle(fontSize: 10),
+                );
+              },
+            ),
           ),
+
+          rightTitles:
+              AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles:
+              AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
 
-        borderData: FlBorderData(show: true),
-
-        minX: spots.isNotEmpty ? spots.first.x : 0,
-        maxX: spots.isNotEmpty ? spots.last.x : 10,
-        minY: minY,
-        maxY: maxY,
-
-        // ---- LINE DATA ----
         lineBarsData: [
           LineChartBarData(
-            spots: spots,
-            isCurved:false,
-            color: lineColor,
-            barWidth: barWidth,
-            isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
-            belowBarData: BarAreaData(
-              show: true,
-              color: lineColor.withValues(alpha: 0.2), // FIX deprecated
+            spots: List.generate(
+              values.length,
+              (i) => FlSpot(i.toDouble(), values[i]),
             ),
+            isCurved: true,
+            color: color,
+            barWidth: 3,
+            dotData: FlDotData(show: false),
           ),
         ],
       ),

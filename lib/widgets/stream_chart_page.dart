@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 
-import '/widgets/line_chart_widget.dart';
+import '../widgets/line_chart_widget.dart';
 
 class StreamChartPage extends StatefulWidget {
   final Stream<double> stream;
@@ -42,240 +41,123 @@ class StreamChartPage extends StatefulWidget {
 }
 
 class _StreamChartPageState extends State<StreamChartPage> {
-  final List<FlSpot> _data = [];
-  double _time = 0;
-  double _current = 0;
+  final List<double> _history = [];
+  final List<DateTime> _times = [];
 
+  double? _currentValue;
   DateTime? _lastUpdate;
-  bool _stale = false;
-
   StreamSubscription<double>? _sub;
-  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
 
     _sub = widget.stream.listen((value) {
-      if (!mounted) return;
       setState(() {
-        _time += 1;
-        _current = value;
+        _currentValue = value;
         _lastUpdate = DateTime.now();
-        _stale = false;
 
-        _data.add(FlSpot(_time, _current));
-        if (_data.length > widget.historyPoints) _data.removeAt(0);
+        _history.add(value);
+        _times.add(_lastUpdate!);
+
+        if (_history.length > widget.historyPoints) {
+          _history.removeAt(0);
+          _times.removeAt(0);
+        }
       });
-    });
-
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
-      final t = _lastUpdate;
-      if (t == null) return;
-      final now = DateTime.now();
-      final isStaleNow = now.difference(t) > widget.staleAfter;
-      if (isStaleNow != _stale) {
-        setState(() => _stale = isStaleNow);
-      }
     });
   }
 
   @override
   void dispose() {
     _sub?.cancel();
-    _timer?.cancel();
     super.dispose();
   }
 
-  String _fmtValue(double v) {
-    final f = widget.valueFormatter;
-    if (f != null) return f(v);
-    return v.toStringAsFixed(1);
-  }
-
-  String _fmtClock(DateTime? t) {
-    if (t == null) return "—";
-    final hh = t.hour.toString().padLeft(2, '0');
-    final mm = t.minute.toString().padLeft(2, '0');
-    final ss = t.second.toString().padLeft(2, '0');
-    return "$hh:$mm:$ss";
+  bool get _isStale {
+    if (_lastUpdate == null) return true;
+    return DateTime.now().difference(_lastUpdate!) > widget.staleAfter;
   }
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final statusText =
+        _currentValue != null ? widget.statusBuilder(_currentValue!) : "--";
 
-    final status = widget.statusBuilder(_current);
-    final color = widget.colorBuilder(_current);
+    final valueText = _currentValue != null
+        ? (widget.valueFormatter?.call(_currentValue!) ??
+            _currentValue!.toStringAsFixed(1))
+        : "--";
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ===== LIVE HEADER =====
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(Icons.sensors_rounded, color: color),
+    final color =
+        _currentValue != null ? widget.colorBuilder(_currentValue!) : Colors.grey;
+
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.title)),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ===== GIÁ TRỊ HIỆN TẠI =====
+            Row(
+              children: [
+                Text(
+                  "$valueText ${widget.unit}",
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 6),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            _pill(
-                              text: _stale ? "MẤT TÍN HIỆU" : "LIVE",
-                              bg: _stale ? cs.errorContainer : cs.primaryContainer,
-                              fg: _stale ? cs.onErrorContainer : cs.onPrimaryContainer,
-                              dot: !_stale,
-                            ),
-                            _pill(
-                              text: "Cập nhật: ${_fmtClock(_lastUpdate)}",
-                              bg: cs.surfaceContainerHighest,
-                              fg: cs.onSurface,
-                            ),
-                            _pill(
-                              text: status,
-                              bg: color.withValues(alpha: 0.14),
-                              fg: color,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          "${_fmtValue(_current)}${widget.unit}",
-                          style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, color: color),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
+                const SizedBox(width: 12),
+                Chip(
+                  label: Text(statusText),
+                  backgroundColor: color.withValues(alpha: 0.15),
+                  labelStyle: TextStyle(color: color),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+            Text("Ngưỡng an toàn: ${widget.safeRangeText}"),
+
+            const SizedBox(height: 16),
+
+            // ===== BIỂU ĐỒ =====
+            Expanded(
+              child: LineChartWidget(
+                values: _history,
+                times: _times,
+                minY: widget.minY,
+                maxY: widget.maxY,
+                color: color,
+                unit: widget.unit,
               ),
             ),
-          ),
 
-          const SizedBox(height: 14),
-
-          // ===== CHART =====
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: SizedBox(
-                height: 260,
-                child: LineChartWidget(
-                  spots: _data,
-                  minY: widget.minY,
-                  maxY: widget.maxY,
-                  lineColor: color,
+            // ===== CẢNH BÁO MẤT KẾT NỐI =====
+            if (_isStale)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text(
+                  "⚠ Dữ liệu chưa được cập nhật",
+                  style: TextStyle(color: Colors.orange),
                 ),
               ),
-            ),
-          ),
 
-          const SizedBox(height: 14),
-
-          // ===== INFO =====
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("Thông tin", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 12),
-                  _row("Giá trị hiện tại", "${_fmtValue(_current)}${widget.unit}", color),
-                  const Divider(height: 18),
-                  _row("Mức độ", status, color),
-                  const Divider(height: 18),
-                  _row("Phạm vi khuyến nghị", widget.safeRangeText, cs.primary),
-                ],
+            // ===== TIP =====
+            if (widget.tips.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const Text(
+                "Khuyến nghị:",
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-            ),
-          ),
-
-          if (widget.tips.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Gợi ý thực tế", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 10),
-                    ...widget.tips.map((t) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(Icons.check_circle_rounded, size: 18, color: cs.primary),
-                              const SizedBox(width: 10),
-                              Expanded(child: Text(t)),
-                            ],
-                          ),
-                        )),
-                  ],
-                ),
+              ...widget.tips.map(
+                (e) => Text("• $e"),
               ),
-            ),
+            ],
           ],
-        ],
-      ),
-    );
-  }
-
-  Widget _row(String label, String value, Color valueColor) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: const TextStyle(fontSize: 14)),
-        Flexible(
-          child: Text(
-            value,
-            textAlign: TextAlign.right,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: valueColor),
-          ),
         ),
-      ],
-    );
-  }
-
-  Widget _pill({
-    required String text,
-    required Color bg,
-    required Color fg,
-    bool dot = false,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(999)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (dot) ...[
-            Container(width: 7, height: 7, decoration: BoxDecoration(color: fg, shape: BoxShape.circle)),
-            const SizedBox(width: 7),
-          ],
-          Text(text, style: TextStyle(color: fg, fontWeight: FontWeight.w700, fontSize: 12)),
-        ],
       ),
     );
   }
