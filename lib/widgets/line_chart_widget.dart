@@ -97,7 +97,7 @@ class LineChartWidget extends StatelessWidget {
               values.length,
               (i) => FlSpot(i.toDouble(), values[i]),
             ),
-            isCurved: true,
+            isCurved: false,
             color: color,
             barWidth: 3,
             dotData: FlDotData(show: false),
