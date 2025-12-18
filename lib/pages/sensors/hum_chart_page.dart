@@ -45,6 +45,7 @@ class HumChartPage extends StatelessWidget {
 
         // ❗ QUAN TRỌNG: tắt title trong chart
         title: "",
+        historyPoints: 10,
 
         unit: "%",
         statusBuilder: SensorStatus.humStatus,

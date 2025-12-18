@@ -41,6 +41,7 @@ class DustPage extends StatelessWidget {
         stream: db.getDustDensityStream(),
         maxY: 500,
         title: "", // ❗ tắt title trong chart
+        historyPoints: 10,
         unit: "µg/m³",
         statusBuilder: SensorStatus.dustStatus,
         colorBuilder: SensorStatus.dustColor,

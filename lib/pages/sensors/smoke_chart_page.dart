@@ -41,6 +41,7 @@ class SmokeChartPage extends StatelessWidget {
         stream: db.getSmokeStream(),
         maxY: 4500,
         title: "", // ❗ tắt title trong chart
+        historyPoints: 10,
         unit: "",
         valueFormatter: (v) => v.toStringAsFixed(0),
         statusBuilder: SensorStatus.smokeStatus,

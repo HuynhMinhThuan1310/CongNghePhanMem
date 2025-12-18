@@ -41,6 +41,7 @@ class TempChartPage extends StatelessWidget {
         stream: db.getTemperatureStream(),
         maxY: 40,
         title: "", // ❗ tắt title trong chart
+        historyPoints: 10,
         unit: "°C",
         statusBuilder: SensorStatus.tempStatus,
         colorBuilder: SensorStatus.tempColor,
