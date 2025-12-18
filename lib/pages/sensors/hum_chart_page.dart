@@ -42,9 +42,8 @@ class HumChartPage extends StatelessWidget {
       body: StreamChartPage(
         stream: db.getHumidityStream(),
         maxY: 100,
-        heartbeatStream: db.getLastSeenStream(), // ✅ chart vẫn chạy dù số liệu đứng
+        heartbeatStream: db.getLastSeenStream(),
         sampleInterval: const Duration(seconds: 3),
-        // ❗ QUAN TRỌNG: tắt title trong chart
         title: "",
         historyPoints: 10,
 
