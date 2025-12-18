@@ -71,7 +71,7 @@ class LineChartWidget extends StatelessWidget {
                 ),
               ),
             ),
-            axisNameSize: 20, // 👈 ÉP KHÔNG GIAN CHO ĐƠN VỊ
+            axisNameSize: 25, // 👈 ÉP KHÔNG GIAN CHO ĐƠN VỊ
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 44, // 👈 ÉP RỘNG ĐỦ CHO SỐ
