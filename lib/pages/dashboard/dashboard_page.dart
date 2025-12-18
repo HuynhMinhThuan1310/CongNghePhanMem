@@ -7,7 +7,7 @@ import 'about_page.dart';
 import '../sensors/temp_chart_page.dart';
 import '../sensors/hum_chart_page.dart';
 import '../sensors/smoke_chart_page.dart';
-import '../sensors/dust_page.dart';
+import '../sensors/dust_chart_page.dart';
 import '../sensors/conclusion_page.dart';
 import '../authentication/change_password_page.dart';
 

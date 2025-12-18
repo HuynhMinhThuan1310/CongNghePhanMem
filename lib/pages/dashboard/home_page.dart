@@ -7,7 +7,7 @@ import '../../services/sensor_status.dart';
 import '../sensors/temp_chart_page.dart';
 import '../sensors/hum_chart_page.dart';
 import '../sensors/smoke_chart_page.dart';
-import '../sensors/dust_page.dart';
+import '../sensors/dust_chart_page.dart';
 import '../sensors/conclusion_page.dart';
 
 class HomePage extends StatefulWidget {
