@@ -28,6 +28,7 @@ class FirebaseDatabaseService {
       _lastUpdate = DateTime.now();
     });
   }
+
     Stream<dynamic> getLastSeenStream() {
   return FirebaseDatabase.instance.ref('ESP32C3/last_seen').onValue;
   }
@@ -92,12 +93,6 @@ class FirebaseDatabaseService {
         .map((e) => _mapEvent(e, historyKey: "mq135"));
   }
 
-  Stream<double> getDustVoltageStream() {
-    return _database
-        .ref('ESP32C3/dust_voltage')
-        .onValue
-        .map((e) => _mapEvent(e, historyKey: "dust_voltage"));
-  }
 
   Stream<double> getDustDensityStream() {
     return _database

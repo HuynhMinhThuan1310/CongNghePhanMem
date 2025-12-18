@@ -33,12 +33,11 @@ class LineChartWidget extends StatelessWidget {
         borderData: FlBorderData(show: true),
 
         titlesData: FlTitlesData(
-          // ================= TRỤC X (THỜI GIAN) =================
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               interval: 1,
-              reservedSize: 36, // ÉP CHỖ CHO THỜI GIAN
+              reservedSize: 36, 
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
                 if (times == null || index < 0 || index >= times!.length) {
@@ -59,7 +58,7 @@ class LineChartWidget extends StatelessWidget {
             ),
           ),
 
-          // ================= TRỤC Y (ÉP HIỆN ĐƠN VỊ) =================
+
           leftTitles: AxisTitles(
             axisNameWidget: Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -71,10 +70,10 @@ class LineChartWidget extends StatelessWidget {
                 ),
               ),
             ),
-            axisNameSize: 25, // 👈 ÉP KHÔNG GIAN CHO ĐƠN VỊ
+            axisNameSize: 25, 
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 44, // 👈 ÉP RỘNG ĐỦ CHO SỐ
+              reservedSize: 44,
               interval: (maxY - minY) / 4,
               getTitlesWidget: (value, meta) {
                 return Text(

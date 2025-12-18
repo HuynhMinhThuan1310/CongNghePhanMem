@@ -76,7 +76,11 @@ class _HistoryChartPageState extends State<HistoryChartPage> {
         ));
       }
     }
-
+  const int keep = 10;
+  if (_values.length > keep) {
+    _values = _values.sublist(_values.length - keep);
+    _times  = _times.sublist(_times.length - keep);
+  }
     _calcStats();
     await _loadLast3DaysAvg();
 
