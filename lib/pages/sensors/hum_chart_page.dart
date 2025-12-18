@@ -38,7 +38,6 @@ class HumChartPage extends StatelessWidget {
         ],
       ),
 
-      // ===== BIỂU ĐỒ REALTIME =====
       body: StreamChartPage(
         stream: db.getHumidityStream(),
         maxY: 100,

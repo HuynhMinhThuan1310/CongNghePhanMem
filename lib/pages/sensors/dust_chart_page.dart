@@ -39,10 +39,10 @@ class DustPage extends StatelessWidget {
       ),
       body: StreamChartPage(
         stream: db.getDustDensityStream(),
-        heartbeatStream: db.getLastSeenStream(), // ✅ chart vẫn chạy dù số liệu đứng
+        heartbeatStream: db.getLastSeenStream(), 
         sampleInterval: const Duration(seconds: 3),
         maxY: 500,
-        title: "", // ❗ tắt title trong chart
+        title: "", 
         historyPoints: 10,
         unit: "µg/m³",
         statusBuilder: SensorStatus.dustStatus,

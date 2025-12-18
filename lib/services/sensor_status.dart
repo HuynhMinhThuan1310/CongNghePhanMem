@@ -1,8 +1,6 @@
-// lib/services/sensor_status.dart
 import 'package:flutter/material.dart';
 
 class SensorStatus {
-  // ---------- Temperature ----------
   static String tempStatus(double t) {
     if (t < 20) return "Lạnh";
     if (t < 25) return "Mát mẻ";
@@ -17,7 +15,7 @@ class SensorStatus {
     return Colors.red;
   }
 
-  // ---------- Humidity ----------
+
   static String humStatus(double h) {
     if (h < 30) return "Quá khô";
     if (h < 40) return "Khô";
@@ -34,7 +32,7 @@ class SensorStatus {
     return Colors.purple;
   }
 
-  // ---------- Dust ----------
+
   static String dustStatus(double d) {
     if (d < 50) return "Tốt";
     if (d < 100) return "Trung bình";
@@ -49,7 +47,6 @@ class SensorStatus {
     return Colors.red;
   }
 
-  // ---------- Smoke / Gas ----------
   static String smokeStatus(double v) {
     if (v < 600) return "An toàn";
     if (v < 1000) return "Nhẹ";

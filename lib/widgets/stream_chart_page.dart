@@ -6,10 +6,7 @@ import '../widgets/line_chart_widget.dart';
 class StreamChartPage extends StatefulWidget {
   final Stream<double> stream;
 
-  /// ✅ Stream heartbeat (ESP32C3/last_seen) để biết còn online dù value đứng
   final Stream<dynamic>? heartbeatStream;
-
-  /// ✅ Nhịp “chạy trục thời gian” (mỗi tick thêm 1 điểm)
   final Duration sampleInterval;
 
   final double minY;
@@ -80,16 +77,15 @@ class _StreamChartPageState extends State<StreamChartPage> {
   void initState() {
     super.initState();
 
-    // 1) Nhận giá trị cảm biến (có thể ít event nếu value không đổi)
+
     _sub = widget.stream.listen((value) {
       setState(() {
         _currentValue = value;
-        // coi như có update
         _lastUpdate = DateTime.now();
       });
     });
 
-    // 2) Heartbeat: cập nhật lastUpdate đều để không báo stale sai
+
     _hbSub = widget.heartbeatStream?.listen((_) {
       if (!mounted) return;
       setState(() {
@@ -97,11 +93,11 @@ class _StreamChartPageState extends State<StreamChartPage> {
       });
     });
 
-    // 3) Timer: để trục thời gian “chạy” => mỗi sampleInterval thêm 1 điểm
+
     _timer = Timer.periodic(widget.sampleInterval, (_) {
       if (!mounted) return;
 
-      // Chỉ chạy khi còn online (không stale) và đã có giá trị đầu tiên
+
       if (_isStale) return;
       if (_currentValue == null) return;
 

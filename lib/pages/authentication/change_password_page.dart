@@ -34,9 +34,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     super.dispose();
   }
 
-  // ==========================
-  // 🔥 Hàm đổi mật khẩu
-  // ==========================
   Future<void> _changePassword() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -56,7 +53,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         _successMessage = "Đổi mật khẩu thành công!";
       });
 
-      // Reset field
       _currentPasswordController.clear();
       _newPasswordController.clear();
       _confirmPasswordController.clear();
@@ -92,9 +88,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // =====================
-              // Mật khẩu hiện tại
-              // =====================
               const Text("Mật khẩu hiện tại",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
@@ -126,9 +119,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
               const SizedBox(height: 24),
 
-              // =====================
-              // Mật khẩu mới
-              // =====================
               const Text("Mật khẩu mới",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
@@ -166,9 +156,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
               const SizedBox(height: 24),
 
-              // =====================
-              // Xác nhận mật khẩu mới
-              // =====================
               const Text("Xác nhận mật khẩu mới",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),

@@ -26,7 +26,6 @@ class AboutPage extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // ---------------- IMAGE ----------------
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.network(
@@ -39,7 +38,6 @@ class AboutPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // ---------------- TITLE ----------------
             const Text(
               "Hệ thống giám sát môi trường thông minh",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -48,7 +46,6 @@ class AboutPage extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // ---------------- DESCRIPTION ----------------
             Text(
               "Dự án sử dụng ESP32C3 kết hợp với các cảm biến DHT11, MQ135 và GP2Y10 để thu thập dữ liệu môi trường "
               "như nhiệt độ, độ ẩm, bụi mịn và khí độc. Tất cả dữ liệu được gửi lên Firebase Realtime Database "
@@ -67,7 +64,6 @@ class AboutPage extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // ---------------- FEATURES ----------------
             _sectionTitle("Tính năng nổi bật"),
             _feature(Icons.update, "Cập nhật dữ liệu thời gian thực"),
             _feature(Icons.show_chart, "Biểu đồ trực quan dễ hiểu"),
@@ -81,7 +77,6 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  // ==================== COMPONENTS =====================
 
   Widget _sectionTitle(String text) {
     return Align(
@@ -91,7 +86,7 @@ class AboutPage extends StatelessWidget {
         style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: primaryTeal,          // 🌟 Màu đồng bộ
+          color: primaryTeal,         
         ),
       ),
     );
@@ -99,7 +94,7 @@ class AboutPage extends StatelessWidget {
 
   Widget _tech(IconData icon, String title, String subtitle) {
     return ListTile(
-      leading: Icon(icon, color: primaryTeal, size: 28), // 🌟 Teal đẹp
+      leading: Icon(icon, color: primaryTeal, size: 28), 
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(subtitle),
       contentPadding: EdgeInsets.zero,
@@ -108,7 +103,7 @@ class AboutPage extends StatelessWidget {
 
   Widget _feature(IconData icon, String title) {
     return ListTile(
-      leading: Icon(icon, color: primaryGreen, size: 24), // 🌟 Xanh lá nhấn mạnh
+      leading: Icon(icon, color: primaryGreen, size: 24), 
       title: Text(title),
       contentPadding: EdgeInsets.zero,
     );

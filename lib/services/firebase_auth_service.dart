@@ -9,9 +9,7 @@ class FirebaseAuthService {
 
   User? get currentUser => _auth.currentUser;
 
-  /// -------------------------
-  /// Validate Email
-  /// -------------------------
+
   bool isValidEmail(String email) {
     final regex = RegExp(
       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
@@ -36,9 +34,7 @@ String getResetPasswordErrorMessage(String code) {
 }
 
 
-  /// -------------------------
-  /// Sign Up
-  /// -------------------------
+
   Future<UserCredential> signUpWithEmail({
     required String email,
     required String password,
@@ -77,9 +73,6 @@ String getResetPasswordErrorMessage(String code) {
   }
 
 
-  /// -------------------------
-  /// Sign In
-  /// -------------------------
   Future<UserCredential> signInWithEmail({
     required String email,
     required String password,
@@ -90,16 +83,11 @@ String getResetPasswordErrorMessage(String code) {
     );
   }
 
-  /// -------------------------
-  /// Logout
-  /// -------------------------
+
   Future<void> signOut() async {
     await _auth.signOut();
   }
 
-  /// -------------------------
-  /// Change Password
-  /// -------------------------
   Future<void> changePassword({
     required String currentPassword,
     required String newPassword,
@@ -122,9 +110,7 @@ String getResetPasswordErrorMessage(String code) {
     await user.updatePassword(newPassword);
   }
 
-  /// -------------------------
-  /// Error Handler
-  /// -------------------------
+
   String getErrorMessage(String code) {
     switch (code) {
       case 'user-not-found':

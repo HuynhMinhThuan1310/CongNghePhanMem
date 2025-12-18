@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF2E7D32), // xanh “môi trường”
+      seedColor: const Color(0xFF2E7D32),
       brightness: Brightness.light,
     );
 

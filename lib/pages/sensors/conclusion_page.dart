@@ -13,13 +13,11 @@ class ConclusionPage extends StatefulWidget {
 class _ConclusionPageState extends State<ConclusionPage> {
   final FirebaseDatabaseService _db = FirebaseDatabaseService();
 
-  // Giá trị đang hiển thị trên UI
   double _temperature = 0;
   double _humidity = 0;
   double _dust = 0;
   double _smoke = 0;
 
-  // Giá trị mới nhất nhận được (pending) - cập nhật liên tục nhưng chưa render
   double _tPending = 0;
   double _hPending = 0;
   double _dPending = 0;
@@ -37,13 +35,11 @@ class _ConclusionPageState extends State<ConclusionPage> {
   void initState() {
     super.initState();
 
-    // Lắng nghe liên tục nhưng KHÔNG setState mỗi lần (tránh nhảy liên tục)
     _tempSub = _db.getTemperatureStream().listen((v) => _tPending = v);
     _humSub = _db.getHumidityStream().listen((v) => _hPending = v);
     _dustSub = _db.getDustDensityStream().listen((v) => _dPending = v);
     _smokeSub = _db.getSmokeStream().listen((v) => _sPending = v);
 
-    // Chỉ cập nhật UI theo nhịp 3 giây để đồng bộ với HomePage
     _tick = Timer.periodic(const Duration(seconds: 3), (_) {
       if (!mounted) return;
       setState(() {
@@ -55,7 +51,6 @@ class _ConclusionPageState extends State<ConclusionPage> {
       });
     });
 
-    // render sớm 1 lần cho đỡ “0”
     Future.delayed(const Duration(milliseconds: 500), () {
       if (!mounted) return;
       setState(() {
@@ -78,7 +73,6 @@ class _ConclusionPageState extends State<ConclusionPage> {
     super.dispose();
   }
 
-  // ---------- SCORE (giữ nguyên như logic của bạn) ----------
   int _tempScore(double t) {
     if (t < 20) return 70;
     if (t < 28) return 100;
@@ -140,7 +134,6 @@ class _ConclusionPageState extends State<ConclusionPage> {
     return "$hh:$mm:$ss";
   }
 
-  // ---------- TILE HIỂN THỊ ----------
   Widget _buildTile({
     required String title,
     required String value,
@@ -195,7 +188,6 @@ class _ConclusionPageState extends State<ConclusionPage> {
     );
   }
 
-  // ---------- UI ----------
   @override
   Widget build(BuildContext context) {
     final overallColor = _healthColor();

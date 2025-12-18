@@ -37,13 +37,11 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    // stream vẫn realtime (GIỮ NGUYÊN đường dẫn đọc Firebase trong service)
     _tSub = _db.getTemperatureStream().listen((v) => _setVal('t', v));
     _hSub = _db.getHumidityStream().listen((v) => _setVal('h', v));
     _sSub = _db.getSmokeStream().listen((v) => _setVal('s', v));
     _dSub = _db.getDustDensityStream().listen((v) => _setVal('d', v));
 
-    // chỉ cập nhật "điểm tổng quan" mỗi 5 giây
     _summaryTimer = Timer.periodic(const Duration(seconds: 3), (_) {
       if (!mounted) return;
       setState(() {
@@ -53,7 +51,6 @@ class _HomePageState extends State<HomePage> {
       });
     });
 
-    // cập nhật lần đầu sau 0.5s để có số sớm
     Future.delayed(const Duration(milliseconds: 500), () {
       if (!mounted) return;
       setState(() {
@@ -99,7 +96,6 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  // ===== score giống thực tế =====
   int _tempScore(double v) {
     if (v < 20) return 70;
     if (v < 28) return 100;
@@ -189,7 +185,6 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ===== HERO =====
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(18),

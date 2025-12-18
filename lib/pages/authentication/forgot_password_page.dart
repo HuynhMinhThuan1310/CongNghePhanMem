@@ -31,7 +31,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     });
 
     try {
-      // 👉 Firebase KHÔNG cho kiểm tra email tồn tại nữa
       await _authService.sendPasswordResetEmail(email);
 
       setState(() {
@@ -39,7 +38,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             "Nếu email tồn tại, hệ thống đã gửi liên kết khôi phục. Vui lòng kiểm tra hộp thư.";
       });
     } on Exception catch (_) {
-      // Không tiết lộ email đúng/sai theo chuẩn Firebase Security
       setState(() {
         _errorMessage =
             "Không thể gửi yêu cầu khôi phục. Vui lòng thử lại sau.";
@@ -71,7 +69,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
           const SizedBox(height: 20),
 
-          // EMAIL INPUT
           TextField(
             controller: _emailController,
             decoration: InputDecoration(

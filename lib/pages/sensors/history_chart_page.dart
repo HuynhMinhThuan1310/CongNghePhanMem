@@ -48,7 +48,6 @@ class _HistoryChartPageState extends State<HistoryChartPage> {
   String _dateKey(DateTime d) =>
       "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
 
-  // ===== LOAD LỊCH SỬ NGÀY ĐANG CHỌN =====
   Future<void> _loadHistory() async {
     setState(() => _loading = true);
 
@@ -84,7 +83,6 @@ class _HistoryChartPageState extends State<HistoryChartPage> {
     setState(() => _loading = false);
   }
 
-  // ===== TÍNH MAX / MIN / AVG =====
   void _calcStats() {
     if (_values.isEmpty) {
       _max = _min = _avg = null;
@@ -96,7 +94,6 @@ class _HistoryChartPageState extends State<HistoryChartPage> {
     _avg = _values.reduce((a, b) => a + b) / _values.length;
   }
 
-  // ===== TRUNG BÌNH 3 NGÀY TRƯỚC =====
   Future<void> _loadLast3DaysAvg() async {
     _avgLast3Days.clear();
 
@@ -117,7 +114,6 @@ class _HistoryChartPageState extends State<HistoryChartPage> {
     }
   }
 
-  // ===== CHỌN NGÀY =====
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -157,10 +153,9 @@ class _HistoryChartPageState extends State<HistoryChartPage> {
                         "Ngày: ${_dateKey(_selectedDate)}",
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
-
                       const SizedBox(height: 12),
 
-                      // ===== BOX THỐNG KÊ =====
+      
                       if (_max != null && _min != null && _avg != null)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -182,7 +177,7 @@ class _HistoryChartPageState extends State<HistoryChartPage> {
 
                       const SizedBox(height: 16),
 
-                      // ===== BIỂU ĐỒ =====
+                      
                       Expanded(
                         child: LineChartWidget(
                           values: _values,
@@ -196,7 +191,6 @@ class _HistoryChartPageState extends State<HistoryChartPage> {
 
                       const SizedBox(height: 16),
 
-                      // ===== SO SÁNH 3 NGÀY TRƯỚC =====
                       if (_avgLast3Days.isNotEmpty) ...[
                         const Text(
                           "So sánh trung bình 3 ngày trước:",
@@ -216,7 +210,6 @@ class _HistoryChartPageState extends State<HistoryChartPage> {
   }
 }
 
-// ===== WIDGET NHỎ HIỂN THỊ SỐ =====
 class _StatBox extends StatelessWidget {
   final String label;
   final double value;
