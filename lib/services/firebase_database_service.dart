@@ -5,19 +5,41 @@ class FirebaseDatabaseService {
   static final FirebaseDatabase _database = FirebaseDatabase.instance;
   final DatabaseReference _db = _database.ref();
 
-  // ===== TIMEOUT: quá thời gian này mà không có data => MẤT TÍN HIỆU
   static const Duration disconnectTimeout = Duration(seconds: 10);
 
-  DateTime? _lastUpdate;
+  // ✅ dùng chung toàn app (mọi instance đều update được)
+  static DateTime? _lastUpdate;
 
-  // ===== PUBLIC: UI dùng để check trạng thái
+  // ✅ heartbeat subscription (chỉ tạo 1 lần)
+  static StreamSubscription<DatabaseEvent>? _hbSub;
+
+  FirebaseDatabaseService() {
+    _ensureHeartbeat();
+  }
+
+  // ✅ UI dùng để check trạng thái
   bool get isDisconnected {
-    if (_lastUpdate == null) return true;
-    return DateTime.now().difference(_lastUpdate!) > disconnectTimeout;
+    final last = _lastUpdate;
+    if (last == null) return true;
+    return DateTime.now().difference(last) > disconnectTimeout;
+  }
+
+  // ✅ đảm bảo luôn lắng nghe last_seen để update _lastUpdate
+  void _ensureHeartbeat() {
+    if (_hbSub != null) return;
+
+    _hbSub = _database.ref('ESP32C3/last_seen').onValue.listen((event) {
+      // Chỉ cần có event (giá trị thay đổi) là coi như thiết bị còn sống
+      _lastUpdate = DateTime.now();
+    });
+  }
+    Stream<dynamic> getLastSeenStream() {
+  return FirebaseDatabase.instance.ref('ESP32C3/last_seen').onValue;
   }
 
   // ===== INTERNAL: parse + update timestamp + LƯU LỊCH SỬ
   double _mapEvent(DatabaseEvent event, {String? historyKey}) {
+    // ✅ mỗi lần có data cảm biến cũng update lastUpdate
     _lastUpdate = DateTime.now();
 
     final v = event.snapshot.value;
@@ -27,10 +49,7 @@ class FirebaseDatabaseService {
 
     // ===== LƯU LỊCH SỬ (KHÔNG ẢNH HƯỞNG STREAM)
     if (historyKey != null) {
-      _saveHistory(
-        sensorKey: historyKey,
-        value: value,
-      );
+      _saveHistory(sensorKey: historyKey, value: value);
     }
 
     return value;
@@ -59,7 +78,7 @@ class FirebaseDatabaseService {
         .set(value);
   }
 
-  // ===== STREAMS (GIỮ NGUYÊN API CŨ) =====
+  // ===== STREAMS =====
 
   Stream<double> getTemperatureStream() {
     return _database
@@ -112,4 +131,12 @@ class FirebaseDatabaseService {
     final raw = Map<String, dynamic>.from(snapshot.value as Map);
     return raw.map((k, v) => MapEntry(k, (v as num).toDouble()));
   }
+
+  // (Tuỳ chọn) nếu bạn muốn chủ động dừng heartbeat khi app đóng hẳn
+  static Future<void> disposeHeartbeat() async {
+    await _hbSub?.cancel();
+    _hbSub = null;
+  }
+
+
 }

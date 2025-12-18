@@ -40,6 +40,8 @@ class TempChartPage extends StatelessWidget {
       body: StreamChartPage(
         stream: db.getTemperatureStream(),
         maxY: 40,
+        heartbeatStream: db.getLastSeenStream(), // ✅ chart vẫn chạy dù số liệu đứng
+        sampleInterval: const Duration(seconds: 3),
         title: "", // ❗ tắt title trong chart
         historyPoints: 10,
         unit: "°C",

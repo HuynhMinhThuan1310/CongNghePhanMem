@@ -39,6 +39,8 @@ class SmokeChartPage extends StatelessWidget {
       ),
       body: StreamChartPage(
         stream: db.getSmokeStream(),
+        heartbeatStream: db.getLastSeenStream(), // ✅ chart vẫn chạy dù số liệu đứng
+        sampleInterval: const Duration(seconds: 3),
         maxY: 4500,
         title: "", // ❗ tắt title trong chart
         historyPoints: 10,
