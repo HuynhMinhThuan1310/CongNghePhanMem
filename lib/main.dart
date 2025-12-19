@@ -6,9 +6,11 @@ import 'firebase_options.dart';
 import 'pages/authentication/auth_page.dart';
 import 'pages/dashboard/dashboard_page.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -36,36 +38,44 @@ class MyApp extends StatelessWidget {
           foregroundColor: scheme.onSurface,
         ),
         cardTheme: const CardThemeData(
-    elevation: 0,
-    margin: EdgeInsets.zero,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(20)),
-    ),
-  ),
-
-  inputDecorationTheme: InputDecorationTheme(
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-  ),
-),
-      home: const AuthWrapper(),
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+      ),
+      home: const AuthGate(),
     );
   }
 }
 
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
+/// ✅ Chỉ vào Dashboard khi đã đăng nhập.
+/// Chưa đăng nhập => AuthPage (đăng ký/đăng nhập).
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
+        // Loading khi FirebaseAuth đang khởi tạo
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        return (snapshot.data != null) ? const DashboardPage() : const AuthPage();
+
+        // Đã login => Dashboard, chưa login => AuthPage
+        final user = snapshot.data;
+        if (user != null) {
+          return const DashboardPage();
+        }
+        return const AuthPage();
       },
     );
   }

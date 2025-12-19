@@ -7,15 +7,10 @@ class FirebaseDatabaseService {
 
   static const Duration disconnectTimeout = Duration(seconds: 10);
 
-  // Lần cuối app nhận được tín hiệu (từ last_seen hoặc bất kỳ sensor stream nào)
   static DateTime? _lastUpdate;
 
-  // Subscription dùng để update _lastUpdate theo last_seen (chỉ 1 lần)
   static StreamSubscription<DatabaseEvent>? _hbSub;
 
-  // ✅ 1 stream last_seen dùng chung toàn app (broadcast)
-  // Tất cả page/StreamBuilder/listen đều dùng lại stream này,
-  // không tạo thêm kết nối/listener Firebase mới.
   static final Stream<DatabaseEvent> _lastSeenEvents$ = _database
       .ref('ESP32C3/last_seen')
       .onValue
@@ -28,7 +23,6 @@ class FirebaseDatabaseService {
   void _ensureHeartbeat() {
     if (_hbSub != null) return;
 
-    // ✅ listen trên stream chung, không listen trực tiếp onValue lần nữa
     _hbSub = _lastSeenEvents$.listen((event) {
       _lastUpdate = DateTime.now();
     });
@@ -40,12 +34,9 @@ class FirebaseDatabaseService {
     return DateTime.now().difference(last) > disconnectTimeout;
   }
 
-  // ✅ Trả về stream last_seen dùng chung (đúng kiểu)
   Stream<DatabaseEvent> getLastSeenStream() => _lastSeenEvents$;
 
-  // ====== Helper: map event -> double + lưu history ======
   double _mapEvent(DatabaseEvent event, {String? historyKey}) {
-    // Có data sensor về cũng coi như "còn sống"
     _lastUpdate = DateTime.now();
 
     final v = event.snapshot.value;
@@ -82,7 +73,6 @@ class FirebaseDatabaseService {
         .set(value);
   }
 
-  // ====== Sensor streams ======
   Stream<double> getTemperatureStream() {
     return _database
         .ref('ESP32C3/nhiet_do')
@@ -111,7 +101,6 @@ class FirebaseDatabaseService {
         .map((e) => _mapEvent(e, historyKey: "dust_density"));
   }
 
-  // ====== History ======
   Future<Map<String, double>> getHistoryByDate({
     required String sensorKey,
     required String dateKey, // yyyy-MM-dd
@@ -128,7 +117,6 @@ class FirebaseDatabaseService {
     return raw.map((k, v) => MapEntry(k, (v as num).toDouble()));
   }
 
-  // ====== Cleanup ======
   static Future<void> disposeHeartbeat() async {
     await _hbSub?.cancel();
     _hbSub = null;
