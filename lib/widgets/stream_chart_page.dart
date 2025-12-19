@@ -57,7 +57,6 @@ class _StreamChartPageState extends State<StreamChartPage> {
   StreamSubscription? _hbSub;
   Timer? _timer;
 
-  // dùng để trigger rebuild khi trạng thái stale thay đổi
   bool _staleShown = true;
 
   bool get _isStale {
@@ -85,7 +84,6 @@ class _StreamChartPageState extends State<StreamChartPage> {
   void initState() {
     super.initState();
 
-    // 1) nghe stream dữ liệu chính
     _sub = widget.stream.listen((value) {
       if (!mounted) return;
       setState(() {
@@ -94,7 +92,6 @@ class _StreamChartPageState extends State<StreamChartPage> {
       });
     });
 
-    // 2) nghe heartbeat (tuỳ chọn)
     _hbSub = widget.heartbeatStream?.listen((_) {
       if (!mounted) return;
       setState(() {
@@ -102,24 +99,20 @@ class _StreamChartPageState extends State<StreamChartPage> {
       });
     });
 
-    // 3) timer: vừa lấy mẫu cho chart, vừa cập nhật stale UI
     _timer = Timer.periodic(widget.sampleInterval, (_) {
       if (!mounted) return;
 
       final nowStale = _isStale;
 
-      // stale chuyển trạng thái thì rebuild để hiện/ẩn cảnh báo
       if (nowStale != _staleShown) {
         setState(() {
           _staleShown = nowStale;
         });
       }
 
-      // nếu stale hoặc chưa có data -> không thêm điểm
       if (nowStale) return;
       if (_currentValue == null) return;
 
-      // thêm điểm vào chart
       setState(() {
         _appendPoint(_currentValue!, DateTime.now());
       });
