@@ -57,6 +57,9 @@ class _StreamChartPageState extends State<StreamChartPage> {
   StreamSubscription? _hbSub;
   Timer? _timer;
 
+  // dùng để trigger rebuild khi trạng thái stale thay đổi
+  bool _staleShown = true;
+
   bool get _isStale {
     if (_lastUpdate == null) return true;
     return DateTime.now().difference(_lastUpdate!) > widget.staleAfter;
@@ -73,34 +76,50 @@ class _StreamChartPageState extends State<StreamChartPage> {
     }
   }
 
+  void _markUpdated() {
+    _lastUpdate = DateTime.now();
+    _staleShown = false;
+  }
+
   @override
   void initState() {
     super.initState();
 
-
+    // 1) nghe stream dữ liệu chính
     _sub = widget.stream.listen((value) {
+      if (!mounted) return;
       setState(() {
         _currentValue = value;
-        _lastUpdate = DateTime.now();
+        _markUpdated();
       });
     });
 
-
+    // 2) nghe heartbeat (tuỳ chọn)
     _hbSub = widget.heartbeatStream?.listen((_) {
       if (!mounted) return;
       setState(() {
-        _lastUpdate = DateTime.now();
+        _markUpdated();
       });
     });
 
-
+    // 3) timer: vừa lấy mẫu cho chart, vừa cập nhật stale UI
     _timer = Timer.periodic(widget.sampleInterval, (_) {
       if (!mounted) return;
 
+      final nowStale = _isStale;
 
-      if (_isStale) return;
+      // stale chuyển trạng thái thì rebuild để hiện/ẩn cảnh báo
+      if (nowStale != _staleShown) {
+        setState(() {
+          _staleShown = nowStale;
+        });
+      }
+
+      // nếu stale hoặc chưa có data -> không thêm điểm
+      if (nowStale) return;
       if (_currentValue == null) return;
 
+      // thêm điểm vào chart
       setState(() {
         _appendPoint(_currentValue!, DateTime.now());
       });
@@ -128,6 +147,8 @@ class _StreamChartPageState extends State<StreamChartPage> {
     final color =
         _currentValue != null ? widget.colorBuilder(_currentValue!) : Colors.grey;
 
+    final staleNow = _isStale;
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: Padding(
@@ -147,7 +168,7 @@ class _StreamChartPageState extends State<StreamChartPage> {
                 const SizedBox(width: 12),
                 Chip(
                   label: Text(statusText),
-                  backgroundColor: color.withValues(alpha: 0.15),
+                  backgroundColor: color.withValues(alpha: 0.14),
                   labelStyle: TextStyle(color: color),
                 ),
               ],
@@ -155,7 +176,6 @@ class _StreamChartPageState extends State<StreamChartPage> {
             const SizedBox(height: 8),
             Text("Ngưỡng an toàn: ${widget.safeRangeText}"),
             const SizedBox(height: 16),
-
             Expanded(
               child: LineChartWidget(
                 values: _history,
@@ -166,8 +186,7 @@ class _StreamChartPageState extends State<StreamChartPage> {
                 unit: widget.unit,
               ),
             ),
-
-            if (_isStale)
+            if (staleNow)
               const Padding(
                 padding: EdgeInsets.only(top: 8),
                 child: Text(
@@ -175,7 +194,6 @@ class _StreamChartPageState extends State<StreamChartPage> {
                   style: TextStyle(color: Colors.orange),
                 ),
               ),
-
             if (widget.tips.isNotEmpty) ...[
               const SizedBox(height: 12),
               const Text(
